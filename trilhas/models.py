@@ -5,7 +5,7 @@ class Trail(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     create_at = models.DateField(auto_now_add=True)
-    number_of_steps = models.PositiveSmallIntegerField()
+    number_of_steps = models.PositiveSmallIntegerField(default=1)
     # Autor?
 
 class Step(models.Model):

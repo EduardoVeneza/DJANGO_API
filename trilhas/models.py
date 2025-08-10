@@ -13,7 +13,7 @@ class Step(models.Model):
     description = models.TextField()
     watched = models.BooleanField(default=False)
     trail = models.ForeignKey(Trail, on_delete=models.CASCADE)
-    position = models.PositiveSmallIntegerField(unique=True)
+    position = models.PositiveSmallIntegerField()
 
     class Meta:
         unique_together = ('trail', 'position') # Garante que a position seja unico somente na respectiva trilha

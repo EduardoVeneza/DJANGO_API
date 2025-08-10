@@ -8,11 +8,23 @@ from .serializers import TrailSerializer
 
 class TrailListAPIView(APIView):
 
-    @swagger_auto_schema(responses={200: TrailSerializer(many=True)})
+    @swagger_auto_schema(responses={200: TrailSerializer(many=True)}, operation_description="Retorna Tudo")
     def get(self, request):
         trails = Trail.objects.all()
         serializer = TrailSerializer(trails, many=True)
         return Response(serializer.data)
+    
+
+    @swagger_auto_schema(
+        request_body=TrailSerializer,
+        responses={201: TrailSerializer}
+    )
+    def post(self, request, format=None):
+        serializer = TrailSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class TrailDetailAPIView(APIView):
@@ -39,11 +51,15 @@ class TrailDetailAPIView(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class TrailCreateAPIView(APIView):
-    @swagger_auto_schema(request_body=TrailSerializer, responses={201: TrailSerializer})
-    def post(self, request):
-        serializer = TrailSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+# class TrailCreateAPIView(APIView):
+
+#     @swagger_auto_schema(
+#         request_body=TrailSerializer,
+#         responses={201: TrailSerializer}
+#     )
+#     def post(self, request, format=None):
+#         serializer = TrailSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

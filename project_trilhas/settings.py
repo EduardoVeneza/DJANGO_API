@@ -45,7 +45,6 @@ INSTALLED_APPS = [
     'trilhas',
 ]
 
-APPEND_SLASH = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

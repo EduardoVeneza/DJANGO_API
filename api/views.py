@@ -42,9 +42,14 @@ class TrailDetailAPIView(APIView):
         operation_description="GET /api/trails/{pk}/ - Retorna os detalhes de uma trilha específica pelo ID."
     )
     def get(self, request, pk):
-        trail = get_object_or_404(Trail, id=pk)
-        serializer = TrailSerializer(trail)
-        return Response(serializer.data)
+        try:
+            trail = get_object_or_404(Trail, id=pk)
+            serializer = TrailSerializer(trail)
+            return Response(serializer.data)
+        except Trail.DoesNotExist:
+            return Response({"detail": "Trail não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({"detail" : "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         request_body=TrailSerializer, 
@@ -52,12 +57,17 @@ class TrailDetailAPIView(APIView):
         operation_description="PUT /api/trails/{pk}/ - Atualiza completamente os dados da trilha identificada pelo ID."
     )
     def put(self, request, pk):
-        trail = get_object_or_404(Trail, id=pk)
-        serializer = TrailSerializer(trail, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            trail = get_object_or_404(Trail, id=pk)
+            serializer = TrailSerializer(trail, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+        except Trail.DoesNotExist:
+            return Response({"detail": "Trail não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({"detail" : "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST)
+        
     
 
     @swagger_auto_schema(
@@ -68,23 +78,28 @@ class TrailDetailAPIView(APIView):
     def patch(self, request, pk, format=None):
         try:
             trail = Trail.objects.get(pk=pk)
+            serializer = TrailSerializer(trail, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
         except Trail.DoesNotExist:
             return Response({"detail": "Trail não encontrado."}, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = TrailSerializer(trail, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except:
+            return Response({"detail" : "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         responses={204: 'No Content'},
         operation_description="DELETE /api/trails/{pk}/ - Remove a trilha especificada pelo ID do banco de dados."
     )
     def delete(self, request, pk):
-        trail = get_object_or_404(Trail, id=pk)
-        trail.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        try:
+            trail = get_object_or_404(Trail, id=pk)
+            trail.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Trail.DoesNotExist:
+            return Response({"detail": "Trail não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({"detail" : "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StepCreateAPIView(APIView):
@@ -112,9 +127,18 @@ class StepListCreateForTrail(APIView):
         operation_description="GET /api/trails/{trail_id}/steps/ - Lista todos os steps da trilha especificada, ordenados pela posição."
     )
     def get(self, request, trail_id):
-        steps = Step.objects.filter(trail_id=trail_id).order_by("position")
-        serializer = StepSerializer(steps, many=True)
-        return Response(serializer.data)
+        try:
+            trail = get_object_or_404(Trail, id=trail_id) # Checa se existe aquela trail
+
+            steps = Step.objects.filter(trail_id=trail_id).order_by("position")
+            serializer = StepSerializer(steps, many=True)
+
+            if len(serializer.data) == 0:
+                return Response({"detail" : "This trail has 0 steps"})
+            
+            return Response(serializer.data)
+        except:
+            return Response({"detail" : "Trail not found"}, status=status.HTTP_404_NOT_FOUND)
     
     @swagger_auto_schema(
         request_body=StepSerializer,

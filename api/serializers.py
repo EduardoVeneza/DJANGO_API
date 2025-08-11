@@ -28,7 +28,6 @@ class StepSerializer(serializers.ModelSerializer):
     class Meta:
         model = Step
         fields = ['id', 'title', 'description', 'watched', 'trail', 'position']
-        # read_only_fields = ['trail']
         validators = [
             serializers.UniqueTogetherValidator(
                 queryset=Step.objects.all(),
@@ -36,6 +35,7 @@ class StepSerializer(serializers.ModelSerializer):
                 message="Já existe um step com essa posição nessa trilha."
             )
         ]
+        # read_only_fields = ['trail']
 
     def validate_position(self, value):
         if value <= 0:

@@ -167,5 +167,6 @@ LinkSchema = openapi.Schema(
             default="Descrição opcional do link",
             nullable=True,
         ),
-    }
+    },
+    read_only=['step']
 )

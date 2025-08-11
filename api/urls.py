@@ -3,11 +3,11 @@ from .views import *
 
 urlpatterns = [
      # Links por step
-    path('steps/<int:step_id>/links/', LinkListCreateAPIView.as_view(), name='link-list-create'),
-    path('links/<int:pk>/', LinkDetailAPIView.as_view(), name='link-detail'),
+    path('steps/<int:step_id>/links/', LinkListCreateAPIView.as_view(), name='link-list-create'), # 100% TESTADOS, TRATADOS E FUNCIONAIS
+    path('links/<int:pk>/', LinkDetailAPIView.as_view(), name='link-detail'), # 100% TESTADO, TRATADO E FUNCIONAL
 
     # Attachments por step
-    path('steps/<int:step_id>/attachments/', AttachmentListCreateAPIView.as_view(), name='attachment-list-create'),
+    path('steps/<int:step_id>/attachments/', AttachmentListCreateAPIView.as_view(), name='attachment-list-create'), # 100% TESTADOS, TRATADOS E FUNCIONAIS
     path('attachments/<int:pk>/', AttachmentDetailAPIView.as_view(), name='attachment-detail'),
 
     # Trails URLS

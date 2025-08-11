@@ -254,7 +254,11 @@ class LinkDetailAPIView(APIView):
     )
     def put(self, request, pk):
         link = get_object_or_404(Link, id=pk)
+
+        request.data['step'] = link.step.id
+
         serializer = LinkSerializer(link, data=request.data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -267,7 +271,7 @@ class LinkDetailAPIView(APIView):
     def delete(self, request, pk):
         link = get_object_or_404(Link, id=pk)
         link.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail" : "deleted!"}, status=status.HTTP_200_OK)
 
 # Essa classe se encarrega de responder requisições no URL: steps/<int:step_id>/attachments/
 # Aqui é possivel criar e listar ligações nos steps de forma facil

@@ -7,9 +7,10 @@ class TrailSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def validate_title(self, value):
-        # Para update, ignora o próprio registro
-        trail_id = self.instance.id if self.instance else None
-        if Trail.objects.filter(title=value).exclude(id=trail_id).exists():
+        qs = Trail.objects.filter(title=value)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
             raise serializers.ValidationError("Já existe um trail com esse título.")
         return value
 

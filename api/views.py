@@ -92,14 +92,9 @@ class TrailDetailAPIView(APIView):
         operation_description="DELETE /api/trails/{pk}/ - Remove a trilha especificada pelo ID do banco de dados."
     )
     def delete(self, request, pk):
-        try:
-            trail = get_object_or_404(Trail, id=pk)
-            trail.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        except Trail.DoesNotExist:
-            return Response({"detail": "Trail não encontrado."}, status=status.HTTP_404_NOT_FOUND)
-        except:
-            return Response({"detail" : "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST)
+        trail = get_object_or_404(Trail, id=pk)
+        trail.delete()
+        return Response({"Message" : "Deleted."}, status=status.HTTP_200_OK)
 
 
 class StepCreateAPIView(APIView):
@@ -159,32 +154,50 @@ class StepListCreateForTrail(APIView):
 
 
 
-class StepDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Step.objects.all()
-    serializer_class = StepSerializer
-
+class StepDetail(APIView):
     @swagger_auto_schema(
-        operation_description="GET /api/steps/{pk}/ - Retorna os detalhes de um step específico pelo ID."
+        operation_description="GET /api/steps/{pk}/ - Retorna os detalhes de um step específico pelo ID.",
+        responses={200: StepSerializer()}
     )
-    def get(self, request, *args, **kwargs):
-        return super().get(request, *args, **kwargs)
+    def get(self, request, pk):
+        step = get_object_or_404(Step, pk=pk)
+        serializer = StepSerializer(step)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    # @swagger_auto_schema(
+    #     request_body=StepSerializer,
+    #     operation_description="PUT /api/steps/{pk}/ - Atualiza completamente os dados do step identificado pelo ID.",
+    #     responses={200: StepSerializer()},
+    # )
+    # def put(self, request, pk):
+    #     step = get_object_or_404(Step, pk=pk)
+    #     serializer = StepSerializer(step, data=request.data)
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_200_OK)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
         request_body=StepSerializer,
-        operation_description="PUT /api/steps/{pk}/ - Atualiza completamente os dados do step identificado pelo ID."
+        operation_description="PATCH /api/steps/{pk}/ - Atualiza parcialmente os dados do step identificado pelo ID.",
+        responses={200: StepSerializer()}
     )
-    def put(self, request, *args, **kwargs):
-        return super().put(request, *args, **kwargs)
+    def patch(self, request, pk):
+        step = get_object_or_404(Step, pk=pk)
+        serializer = StepSerializer(step, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
-        request_body=StepSerializer,
-        operation_description="PATCH /api/steps/{pk}/ - Atualiza parcialmente os dados do step identificado pelo ID."
+        operation_description="DELETE /api/steps/{pk}/ - Remove o step especificado pelo ID do banco de dados.",
+        responses={204: "No Content"}
     )
-    def patch(self, request, *args, **kwargs):
-        return super().patch(request, *args, **kwargs)
-
-    @swagger_auto_schema(
-        operation_description="DELETE /api/steps/{pk}/ - Remove o step especificado pelo ID do banco de dados."
-    )
-    def delete(self, request, *args, **kwargs):
-        return super().delete(request, *args, **kwargs)
+    def delete(self, request, pk):
+        try:
+            step = get_object_or_404(Step, pk=pk)
+            step.delete()
+            return Response(status=status.HTTP_200_OK)
+        except:
+            return Response(status=status.HTTP_204_NO_CONTENT)

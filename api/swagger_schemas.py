@@ -30,6 +30,12 @@ trail_post_schema = openapi.Schema(
             maximum=9223372036854776000,
             default=10
         ),
+        'autor': openapi.Schema(
+            type=openapi.TYPE_STRING,
+            title="autor",
+            minLength=1,
+            default=""
+        ),
     },
     required=['title', 'description']
 )
@@ -92,5 +98,11 @@ StepCreateSchema = openapi.Schema(
             minimum=0,
             default=1
         ),
+        "video_url": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            title="video_url",
+            minLength=1,
+            default="http://example.com/video.mp4",
+        )
     }
 )

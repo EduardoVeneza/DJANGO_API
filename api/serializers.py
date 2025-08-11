@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from trilhas.models import Trail, Link, Step
+from trilhas.models import Trail, Link, Step, Attachment
 
 class TrailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,20 +15,23 @@ class TrailSerializer(serializers.ModelSerializer):
         return value
 
 
-class LinkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Link
-        fields = [
-            
-        ]
-
-
 class StepSerializer(serializers.ModelSerializer):
-    # trail = serializers.PrimaryKeyRelatedField(read_only=True)  # só leitura, vem da URL
+    # Para facilitar a leitura dos links e attachments relacionados, adiciono nested serializers (read-only)
+    links = serializers.SerializerMethodField()
+    attachments = serializers.SerializerMethodField()
 
     class Meta:
         model = Step
-        fields = ['id', 'title', 'description', 'watched', 'trail', 'position']
+        fields = ['id', 
+                  'title', 
+                  'description', 
+                  'video_url', 
+                  'watched', 
+                  'trail', 
+                  'position', 
+                  'links', 
+                  'attachments'
+                  ]
         validators = [
             serializers.UniqueTogetherValidator(
                 queryset=Step.objects.all(),
@@ -36,9 +39,41 @@ class StepSerializer(serializers.ModelSerializer):
                 message="Já existe um step com essa posição nessa trilha."
             )
         ]
-        # read_only_fields = ['trail']
 
     def validate_position(self, value):
         if value <= 0:
             raise serializers.ValidationError("A posição deve ser maior que zero.")
         return value
+
+    def get_links(self, obj):
+        links = obj.links.all()
+        return LinkSerializer(links, many=True).data
+
+    def get_attachments(self, obj):
+        attachments = obj.attachments.all()
+        return AttachmentSerializer(attachments, many=True).data
+
+
+class LinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Link
+        fields = ['id', 
+                  'link', 
+                  'description', 
+                  'created_at', 
+                  'step'
+                  ]
+
+
+class AttachmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attachment
+        fields = ['id', 
+                  'name', 
+                  'phone', 
+                  'email', 
+                  'video_duration', 
+                  'file_url', 
+                  'created_at', 
+                  'step'
+                  ]

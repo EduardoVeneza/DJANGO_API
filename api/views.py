@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status, generics
 from drf_yasg.utils import swagger_auto_schema
 from django.shortcuts import get_object_or_404
-from trilhas.models import Trail, Step, Link
-from .serializers import TrailSerializer, StepSerializer, LinkSerializer
+from trilhas.models import Trail, Step, Link, Attachment
+from .serializers import TrailSerializer, StepSerializer, LinkSerializer, AttachmentSerializer
 from .swagger_schemas import StepCreateSchema, trail_put_schema, trail_post_schema
 
 
@@ -196,3 +196,122 @@ class StepDetail(APIView):
             return Response(status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_204_NO_CONTENT)
+        
+class LinkListCreateAPIView(APIView):
+    @swagger_auto_schema(
+        responses={200: LinkSerializer(many=True)},
+        operation_description="GET /api/steps/{step_id}/links/ - Lista todos os links da etapa especificada."
+    )
+    def get(self, request, step_id):
+        step = get_object_or_404(Step, id=step_id)
+        links = Link.objects.filter(step=step)
+        serializer = LinkSerializer(links, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        request_body=LinkSerializer,
+        responses={201: LinkSerializer},
+        operation_description="POST /api/steps/{step_id}/links/ - Cria um novo link para a etapa especificada."
+    )
+    def post(self, request, step_id):
+        step = get_object_or_404(Step, id=step_id)
+        data = request.data.copy()
+        data['step'] = step.id
+        serializer = LinkSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LinkDetailAPIView(APIView):
+    @swagger_auto_schema(
+        responses={200: LinkSerializer},
+        operation_description="GET /api/links/{pk}/ - Retorna os detalhes de um link específico."
+    )
+    def get(self, request, pk):
+        link = get_object_or_404(Link, id=pk)
+        serializer = LinkSerializer(link)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        request_body=LinkSerializer,
+        responses={200: LinkSerializer},
+        operation_description="PUT /api/links/{pk}/ - Atualiza completamente um link."
+    )
+    def put(self, request, pk):
+        link = get_object_or_404(Link, id=pk)
+        serializer = LinkSerializer(link, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        responses={204: 'No Content'},
+        operation_description="DELETE /api/links/{pk}/ - Deleta um link."
+    )
+    def delete(self, request, pk):
+        link = get_object_or_404(Link, id=pk)
+        link.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class AttachmentListCreateAPIView(APIView):
+    @swagger_auto_schema(
+        responses={200: AttachmentSerializer(many=True)},
+        operation_description="GET /api/steps/{step_id}/attachments/ - Lista todos os anexos da etapa especificada."
+    )
+    def get(self, request, step_id):
+        step = get_object_or_404(Step, id=step_id)
+        attachments = Attachment.objects.filter(step=step)
+        serializer = AttachmentSerializer(attachments, many=True)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        request_body=AttachmentSerializer,
+        responses={201: AttachmentSerializer},
+        operation_description="POST /api/steps/{step_id}/attachments/ - Cria um novo anexo para a etapa especificada."
+    )
+    def post(self, request, step_id):
+        step = get_object_or_404(Step, id=step_id)
+        data = request.data.copy()
+        data['step'] = step.id
+        serializer = AttachmentSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AttachmentDetailAPIView(APIView):
+    @swagger_auto_schema(
+        responses={200: AttachmentSerializer},
+        operation_description="GET /api/attachments/{pk}/ - Retorna os detalhes de um anexo específico."
+    )
+    def get(self, request, pk):
+        attachment = get_object_or_404(Attachment, id=pk)
+        serializer = AttachmentSerializer(attachment)
+        return Response(serializer.data)
+
+    @swagger_auto_schema(
+        request_body=AttachmentSerializer,
+        responses={200: AttachmentSerializer},
+        operation_description="PUT /api/attachments/{pk}/ - Atualiza completamente um anexo."
+    )
+    def put(self, request, pk):
+        attachment = get_object_or_404(Attachment, id=pk)
+        serializer = AttachmentSerializer(attachment, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        responses={204: 'No Content'},
+        operation_description="DELETE /api/attachments/{pk}/ - Deleta um anexo."
+    )
+    def delete(self, request, pk):
+        attachment = get_object_or_404(Attachment, id=pk)
+        attachment.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

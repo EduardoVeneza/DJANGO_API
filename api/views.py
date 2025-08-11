@@ -106,7 +106,7 @@ class TrailDetailAPIView(APIView):
 
         trail = get_object_or_404(Trail, id=pk)
         trail.delete()
-        return Response({"Message" : "Deleted."}, status=status.HTTP_200_OK)
+        return Response({"Message" : "trail Deleted."}, status=status.HTTP_200_OK)
 
 
 
@@ -200,11 +200,9 @@ class StepDetail(APIView):
         except:
             return Response({"detail" : "The Given Step ID is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
 
-
-
         step = get_object_or_404(Step, pk=pk)
         step.delete()
-        return Response(status=status.HTTP_200_OK)
+        return Response({"detail" : "step deleted!"}, status=status.HTTP_200_OK)
 
     
 # Essa classe se encarrega de responder requisições no URL: steps/<int:step_id>/links/
@@ -271,7 +269,7 @@ class LinkDetailAPIView(APIView):
     def delete(self, request, pk):
         link = get_object_or_404(Link, id=pk)
         link.delete()
-        return Response({"detail" : "deleted!"}, status=status.HTTP_200_OK)
+        return Response({"detail" : "link deleted!"}, status=status.HTTP_200_OK)
 
 # Essa classe se encarrega de responder requisições no URL: steps/<int:step_id>/attachments/
 # Aqui é possivel criar e listar ligações nos steps de forma facil
@@ -320,6 +318,10 @@ class AttachmentDetailAPIView(APIView):
     )
     def put(self, request, pk):
         attachment = get_object_or_404(Attachment, id=pk)
+
+        print(attachment.step.id)
+        request.data['step'] = attachment.step.id
+
         serializer = AttachmentSerializer(attachment, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -333,4 +335,4 @@ class AttachmentDetailAPIView(APIView):
     def delete(self, request, pk):
         attachment = get_object_or_404(Attachment, id=pk)
         attachment.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"detail" : "attachment deleted!"}, status=status.HTTP_200_OK)

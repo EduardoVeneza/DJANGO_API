@@ -166,21 +166,8 @@ class StepDetail(APIView):
         serializer = StepSerializer(step)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # @swagger_auto_schema(
-    #     request_body=StepSerializer,
-    #     operation_description="PUT /api/steps/{pk}/ - Atualiza completamente os dados do step identificado pelo ID.",
-    #     responses={200: StepSerializer()},
-    # )
-    # def put(self, request, pk):
-    #     step = get_object_or_404(Step, pk=pk)
-    #     serializer = StepSerializer(step, data=request.data)
-    #     if serializer.is_valid():
-    #         serializer.save()
-    #         return Response(serializer.data, status=status.HTTP_200_OK)
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     @swagger_auto_schema(
-        request_body=StepSerializer,
+        request_body=StepCreateSchema,
         operation_description="PATCH /api/steps/{pk}/ - Atualiza parcialmente os dados do step identificado pelo ID.",
         responses={200: StepSerializer()}
     )

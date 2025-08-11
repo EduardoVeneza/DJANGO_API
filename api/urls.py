@@ -16,5 +16,5 @@ urlpatterns = [
     
     # Steps vinculados à trilha
     path('trails/<int:trail_id>/steps/', StepListCreateForTrail.as_view(), name='trail-steps'), # 100% TESTADOS, TRATADOS E FUNCIONAIS
-    path('steps/<int:pk>/', StepDetail.as_view(), name='step-detail'),
+    path('steps/<int:pk>/', StepDetail.as_view(), name='step-detail'), # 100% TESDADOS, TRATADOS E FUNCIONAIS
 ]

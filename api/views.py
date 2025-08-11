@@ -160,6 +160,11 @@ class StepDetail(APIView):
         responses={200: StepSerializer()}
     )
     def get(self, request, pk):
+        try:
+            pk = int(pk)
+        except:
+            return Response({"detail" : "The Given Step ID is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+
         step = get_object_or_404(Step, pk=pk)
         serializer = StepSerializer(step)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -175,6 +180,8 @@ class StepDetail(APIView):
         data = request.data.copy()
 
         data['watched'] = False # Garante que o watched irá continuar falso já que só irá ser atualizado por um endpoint proprio
+        # e se está sendo atualizado, não tem como alguem ter visto
+
         data['trail'] = step.trail.id # Garante que o trail ID continuará sendo o mesmo, mesmo se vier no JSON um outro valor
 
         serializer = StepSerializer(step, data=data, partial=True)
@@ -189,11 +196,16 @@ class StepDetail(APIView):
     )
     def delete(self, request, pk):
         try:
-            step = get_object_or_404(Step, pk=pk)
-            step.delete()
-            return Response(status=status.HTTP_200_OK)
+            pk = int(pk)
         except:
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({"detail" : "The Given Step ID is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+        step = get_object_or_404(Step, pk=pk)
+        step.delete()
+        return Response(status=status.HTTP_200_OK)
+
     
 # Essa classe se encarrega de responder requisições no URL: steps/<int:step_id>/links/
 # Aqui o usuário pode listar e criar links em uma determinada etapa, o backend determina a etapa pelo endpoint

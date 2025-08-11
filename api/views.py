@@ -146,7 +146,7 @@ class StepListCreateForTrail(APIView):
         data = request.data.copy()  # copia para dict mutável
         data['trail'] = trail.id   # adiciona o ID da trilha no corpo
         data['watched'] = False
-        
+
         serializer = StepSerializer(data=data)
         if serializer.is_valid():
             serializer.save()
@@ -185,7 +185,13 @@ class StepDetail(APIView):
     )
     def patch(self, request, pk):
         step = get_object_or_404(Step, pk=pk)
-        serializer = StepSerializer(step, data=request.data, partial=True)
+
+        data = request.data.copy()
+
+        data['watched'] = False # Garante que o watched irá continuar falso já que só irá ser atualizado por um endpoint proprio
+        data['trail'] = step.trail.id # Garante que o trail ID continuará sendo o mesmo, mesmo se vier no JSON um outro valor
+
+        serializer = StepSerializer(step, data=data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)

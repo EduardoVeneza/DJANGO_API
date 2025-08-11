@@ -106,3 +106,66 @@ StepCreateSchema = openapi.Schema(
         )
     }
 )
+
+AttachmentSchema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    required=[],
+    properties={
+        "name": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            title="Name",
+            minLength=0,
+            default="Attachment Name",
+            nullable=True,
+        ),
+        "phone": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            title="Phone",
+            minLength=0,
+            default="+55 71 99999-9999",
+            nullable=True,
+        ),
+        "email": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_EMAIL,
+            title="Email",
+            default="usuario@email.com",
+            nullable=True,
+        ),
+        "video_duration": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            title="Video Duration (timedelta format)",
+            default="00:05:30",
+            description="Formato hh:mm:ss",
+            nullable=True,
+        ),
+        "file_url": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_URI,
+            title="File URL",
+            default="http://example.com/file.pdf",
+            nullable=True,
+        ),
+    }
+)
+
+LinkSchema = openapi.Schema(
+    type=openapi.TYPE_OBJECT,
+    required=["link"],
+    properties={
+        "link": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            format=openapi.FORMAT_URI,
+            title="Link URL",
+            minLength=1,
+            default="http://example.com/resource"
+        ),
+        "description": openapi.Schema(
+            type=openapi.TYPE_STRING,
+            title="Description",
+            minLength=0,
+            default="Descrição opcional do link",
+            nullable=True,
+        ),
+    }
+)

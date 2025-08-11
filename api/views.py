@@ -6,9 +6,10 @@ from drf_yasg.utils import swagger_auto_schema
 from django.shortcuts import get_object_or_404
 from trilhas.models import Trail, Step, Link, Attachment
 from .serializers import TrailSerializer, StepSerializer, LinkSerializer, AttachmentSerializer
-from .swagger_schemas import StepCreateSchema, trail_put_schema, trail_post_schema
+from .swagger_schemas import StepCreateSchema, trail_put_schema, trail_post_schema, LinkSchema, AttachmentSchema
 
-
+# Essa classe se encarrega de responder requisições no URL: trails/
+# Implementa respostas para um GET e POST nesse endpoint
 class TrailListAPIView(APIView):
 
     @swagger_auto_schema(
@@ -18,6 +19,8 @@ class TrailListAPIView(APIView):
     def get(self, request):
         trails = Trail.objects.all()
         serializer = TrailSerializer(trails, many=True)
+        if len(serializer.data) == 0:
+            return Response({"detail" : "No existing trails"}, status=status.HTTP_204_NO_CONTENT)
         return Response(serializer.data)
     
 
@@ -36,6 +39,9 @@ class TrailListAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
+# Essa classe se encarrega de responder requisições no URL: trails/<str:pk>/
+# Implementa o CRUD que permite que o usuário manipule as trails
 class TrailDetailAPIView(APIView):
 
     @swagger_auto_schema(
@@ -44,13 +50,13 @@ class TrailDetailAPIView(APIView):
     )
     def get(self, request, pk):
         try:
-            trail = get_object_or_404(Trail, id=pk)
-            serializer = TrailSerializer(trail)
-            return Response(serializer.data)
-        except Trail.DoesNotExist:
-            return Response({"detail": "Trail não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            pk = int(pk)
         except:
-            return Response({"detail" : "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail" : "The Given Trail ID is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+            
+        trail = get_object_or_404(Trail, id=pk)
+        serializer = TrailSerializer(trail)
+        return Response(serializer.data)
 
     @swagger_auto_schema(
         request_body=trail_put_schema, 
@@ -59,18 +65,18 @@ class TrailDetailAPIView(APIView):
     )
     def put(self, request, pk):
         try:
-            trail = get_object_or_404(Trail, id=pk)
-            serializer = TrailSerializer(trail, data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-        except Trail.DoesNotExist:
-            return Response({"detail": "Trail não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            pk = int(pk)
         except:
-            return Response({"detail" : "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail" : "The Given Trail ID is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        trail = get_object_or_404(Trail, id=pk)
+        serializer = TrailSerializer(trail, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        
         
     
-
     @swagger_auto_schema(
         request_body=trail_put_schema, 
         responses={200: TrailSerializer},
@@ -78,44 +84,35 @@ class TrailDetailAPIView(APIView):
     )
     def patch(self, request, pk, format=None):
         try:
-            trail = Trail.objects.get(pk=pk)
-            serializer = TrailSerializer(trail, data=request.data, partial=True)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data)
-        except Trail.DoesNotExist:
-            return Response({"detail": "Trail não encontrado."}, status=status.HTTP_404_NOT_FOUND)
+            pk = int(pk)
         except:
-            return Response({"detail" : "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail" : "The Given Trail ID is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        trail = get_object_or_404(Trail, id=pk)
+        serializer = TrailSerializer(trail, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
 
     @swagger_auto_schema(
         responses={204: 'No Content'},
         operation_description="DELETE /api/trails/{pk}/ - Remove a trilha especificada pelo ID do banco de dados."
     )
     def delete(self, request, pk):
+        try:
+            pk = int(pk)
+        except:
+            return Response({"detail" : "The Given Trail ID is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+
+
         trail = get_object_or_404(Trail, id=pk)
         trail.delete()
         return Response({"Message" : "Deleted."}, status=status.HTTP_200_OK)
 
 
-class StepCreateAPIView(APIView):
 
-    @swagger_auto_schema(
-        request_body=StepSerializer,
-        responses={201: StepSerializer},
-        operation_description="POST /api/trails/{trail_id}/steps/ - Cria um novo step vinculado à trilha especificada."
-    )
-    def post(self, request, trail_id):
-        trail = get_object_or_404(Trail, id=trail_id)
-        serializer = StepSerializer(data=request.data)
-        
-        if serializer.is_valid():
-            serializer.save(trail=trail)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+# Essa classe se encarrega de responder requisições no URL: trails/<int:trail_id>/steps/
+# Pode-se utilizar para criar e listar as etapas em uma determinada trilha
 class StepListCreateForTrail(APIView):
     
     @swagger_auto_schema(
@@ -155,7 +152,8 @@ class StepListCreateForTrail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
+# Essa classe se encarrega de responder requisições no URL: steps/<int:pk>/
+# CRUD das Estapas, aqui o usuário pode manipular as Etapas de forma única, sem ligação exata com a trilha
 class StepDetail(APIView):
     @swagger_auto_schema(
         operation_description="GET /api/steps/{pk}/ - Retorna os detalhes de um step específico pelo ID.",
@@ -196,7 +194,9 @@ class StepDetail(APIView):
             return Response(status=status.HTTP_200_OK)
         except:
             return Response(status=status.HTTP_204_NO_CONTENT)
-        
+    
+# Essa classe se encarrega de responder requisições no URL: steps/<int:step_id>/links/
+# Aqui o usuário pode listar e criar links em uma determinada etapa, o backend determina a etapa pelo endpoint
 class LinkListCreateAPIView(APIView):
     @swagger_auto_schema(
         responses={200: LinkSerializer(many=True)},
@@ -209,7 +209,7 @@ class LinkListCreateAPIView(APIView):
         return Response(serializer.data)
 
     @swagger_auto_schema(
-        request_body=LinkSerializer,
+        request_body=LinkSchema,
         responses={201: LinkSerializer},
         operation_description="POST /api/steps/{step_id}/links/ - Cria um novo link para a etapa especificada."
     )
@@ -223,7 +223,8 @@ class LinkListCreateAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+# Essa classe se encarrega de responder requisições no URL: links/<int:pk>/
+# Aqui está o CRUD para os links
 class LinkDetailAPIView(APIView):
     @swagger_auto_schema(
         responses={200: LinkSerializer},
@@ -235,7 +236,7 @@ class LinkDetailAPIView(APIView):
         return Response(serializer.data)
 
     @swagger_auto_schema(
-        request_body=LinkSerializer,
+        request_body=LinkSchema,
         responses={200: LinkSerializer},
         operation_description="PUT /api/links/{pk}/ - Atualiza completamente um link."
     )
@@ -256,7 +257,8 @@ class LinkDetailAPIView(APIView):
         link.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
-
+# Essa classe se encarrega de responder requisições no URL: steps/<int:step_id>/attachments/
+# Aqui é possivel criar e listar ligações nos steps de forma facil
 class AttachmentListCreateAPIView(APIView):
     @swagger_auto_schema(
         responses={200: AttachmentSerializer(many=True)},
@@ -269,7 +271,7 @@ class AttachmentListCreateAPIView(APIView):
         return Response(serializer.data)
 
     @swagger_auto_schema(
-        request_body=AttachmentSerializer,
+        request_body=AttachmentSchema,
         responses={201: AttachmentSerializer},
         operation_description="POST /api/steps/{step_id}/attachments/ - Cria um novo anexo para a etapa especificada."
     )
@@ -283,7 +285,8 @@ class AttachmentListCreateAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+# Essa classe se encarrega de responder requisições no URL: attachments/<int:pk>/
+# CRUD dos attachments, aqui o usuário manipula os attachments de forma individual
 class AttachmentDetailAPIView(APIView):
     @swagger_auto_schema(
         responses={200: AttachmentSerializer},
@@ -295,7 +298,7 @@ class AttachmentDetailAPIView(APIView):
         return Response(serializer.data)
 
     @swagger_auto_schema(
-        request_body=AttachmentSerializer,
+        request_body=AttachmentSchema,
         responses={200: AttachmentSerializer},
         operation_description="PUT /api/attachments/{pk}/ - Atualiza completamente um anexo."
     )

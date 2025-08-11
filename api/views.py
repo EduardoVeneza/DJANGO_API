@@ -145,7 +145,8 @@ class StepListCreateForTrail(APIView):
 
         data = request.data.copy()  # copia para dict mutável
         data['trail'] = trail.id   # adiciona o ID da trilha no corpo
-
+        data['watched'] = False
+        
         serializer = StepSerializer(data=data)
         if serializer.is_valid():
             serializer.save()

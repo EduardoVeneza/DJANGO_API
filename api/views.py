@@ -6,6 +6,7 @@ from drf_yasg.utils import swagger_auto_schema
 from django.shortcuts import get_object_or_404
 from trilhas.models import Trail, Step, Link
 from .serializers import TrailSerializer, StepSerializer, LinkSerializer
+from .swagger_schemas import StepCreateSchema, trail_put_schema, trail_post_schema
 
 
 class TrailListAPIView(APIView):
@@ -21,7 +22,7 @@ class TrailListAPIView(APIView):
     
 
     @swagger_auto_schema(
-        request_body=TrailSerializer,
+        request_body=trail_post_schema,
         responses={201: TrailSerializer},
         operation_description="POST /api/trails/ - Cria uma nova trilha a partir dos dados fornecidos no JSON da requisição."
     )
@@ -52,7 +53,7 @@ class TrailDetailAPIView(APIView):
             return Response({"detail" : "Invalid ID format"}, status=status.HTTP_400_BAD_REQUEST)
 
     @swagger_auto_schema(
-        request_body=TrailSerializer, 
+        request_body=trail_put_schema, 
         responses={200: TrailSerializer},
         operation_description="PUT /api/trails/{pk}/ - Atualiza completamente os dados da trilha identificada pelo ID."
     )
@@ -71,7 +72,7 @@ class TrailDetailAPIView(APIView):
     
 
     @swagger_auto_schema(
-        request_body=TrailSerializer, 
+        request_body=trail_put_schema, 
         responses={200: TrailSerializer},
         operation_description="PATCH /api/trails/{pk}/ - Atualiza parcialmente os dados da trilha pelo ID, permitindo modificar apenas alguns campos."
     )
@@ -136,7 +137,7 @@ class StepListCreateForTrail(APIView):
             return Response({"detail" : "Trail not found"}, status=status.HTTP_404_NOT_FOUND)
     
     @swagger_auto_schema(
-        request_body=StepSerializer,
+        request_body=StepCreateSchema,
         responses={201: StepSerializer},
         operation_description="POST /api/trails/{trail_id}/steps/ - Cria um novo step para a trilha especificada."
     )

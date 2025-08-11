@@ -11,10 +11,10 @@ urlpatterns = [
     path('attachments/<int:pk>/', AttachmentDetailAPIView.as_view(), name='attachment-detail'),
 
     # Trails URLS
-    path('trails/', TrailListAPIView.as_view()),
-    path('trails/<str:pk>/', TrailDetailAPIView.as_view()),
+    path('trails/', TrailListAPIView.as_view()), # 100% TESTADOS, TRATADOS E FUNCIONAIS
+    path('trails/<str:pk>/', TrailDetailAPIView.as_view()), # 100% TESTADOS, TRADADOS E FUNCIONAIS
     
     # Steps vinculados à trilha
-    path('trails/<int:trail_id>/steps/', StepListCreateForTrail.as_view(), name='trail-steps'),
+    path('trails/<int:trail_id>/steps/', StepListCreateForTrail.as_view(), name='trail-steps'), # 100% TESTADOS, TRATADOS E FUNCIONAIS
     path('steps/<int:pk>/', StepDetail.as_view(), name='step-detail'),
 ]

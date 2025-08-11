@@ -104,7 +104,6 @@ class TrailDetailAPIView(APIView):
         except:
             return Response({"detail" : "The Given Trail ID is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
 
-
         trail = get_object_or_404(Trail, id=pk)
         trail.delete()
         return Response({"Message" : "Deleted."}, status=status.HTTP_200_OK)
@@ -120,18 +119,14 @@ class StepListCreateForTrail(APIView):
         operation_description="GET /api/trails/{trail_id}/steps/ - Lista todos os steps da trilha especificada, ordenados pela posição."
     )
     def get(self, request, trail_id):
-        try:
-            trail = get_object_or_404(Trail, id=trail_id) # Checa se existe aquela trail
+        trail = get_object_or_404(Trail, id=trail_id) # Checa se existe aquela trail
 
-            steps = Step.objects.filter(trail_id=trail_id).order_by("position")
-            serializer = StepSerializer(steps, many=True)
+        steps = Step.objects.filter(trail_id=trail_id).order_by("position")
+        serializer = StepSerializer(steps, many=True)
 
-            if len(serializer.data) == 0:
-                return Response({"detail" : "This trail has 0 steps"})
-            
-            return Response(serializer.data)
-        except:
-            return Response({"detail" : "Trail not found"}, status=status.HTTP_404_NOT_FOUND)
+        if len(serializer.data) == 0:
+            return Response({"detail" : "This trail has 0 steps"})    
+        return Response(serializer.data)
     
     @swagger_auto_schema(
         request_body=StepCreateSchema,
@@ -139,11 +134,16 @@ class StepListCreateForTrail(APIView):
         operation_description="POST /api/trails/{trail_id}/steps/ - Cria um novo step para a trilha especificada."
     )
     def post(self, request, trail_id):
+        try:
+            trail_id = int(trail_id)
+        except:
+            return Response({"detail" : "The Given Trail ID is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
+
         trail = get_object_or_404(Trail, id=trail_id)
 
         data = request.data.copy()  # copia para dict mutável
         data['trail'] = trail.id   # adiciona o ID da trilha no corpo
-        data['watched'] = False
+        data['watched'] = False # Acabou de ser criado então o status é watched false
 
         serializer = StepSerializer(data=data)
         if serializer.is_valid():

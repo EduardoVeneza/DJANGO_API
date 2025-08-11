@@ -1,12 +1,11 @@
 from rest_framework.views import APIView
-from rest_framework.exceptions import NotFound
 from rest_framework.response import Response
-from rest_framework import status, generics
+from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from django.shortcuts import get_object_or_404
 from trilhas.models import Trail, Step, Link, Attachment
 from .serializers import TrailSerializer, StepSerializer, LinkSerializer, AttachmentSerializer
-from .swagger_schemas import StepCreateSchema, trail_put_schema, trail_post_schema, LinkSchema, AttachmentSchema
+from .swagger_schemas import StepCreateSchema, trail_put_schema, trail_post_schema, LinkSchema, AttachmentSchema, watched_schema
 
 # Essa classe se encarrega de responder requisições no URL: trails/
 # Implementa respostas para um GET e POST nesse endpoint
@@ -336,3 +335,40 @@ class AttachmentDetailAPIView(APIView):
         attachment = get_object_or_404(Attachment, id=pk)
         attachment.delete()
         return Response({"detail" : "attachment deleted!"}, status=status.HTTP_200_OK)
+    
+
+class WatchedStatusAPIView(APIView):
+    @swagger_auto_schema(
+        responses={200: "Retorna se aquela etapa já foi assistida ou não"},
+        operation_description="GET steps/{id}/isWatched - Retorna status de watched do step"
+    )
+    def get(self, request, pk):
+        print(pk)
+        step = get_object_or_404(Step, id=pk)
+        return Response({
+            "step": pk,
+            "watched_status": step.watched
+        }, status=status.HTTP_200_OK)
+
+    @swagger_auto_schema(
+        request_body=watched_schema,
+        responses={200: "Marca como assistido ou não"},
+        operation_description="POST steps/{id}/isWatched - Atualiza status de watched"
+    )
+    def post(self, request, pk):
+        step = get_object_or_404(Step, id=pk)
+        watched_status = request.data.get("watched")
+
+        if watched_status is None:
+            return Response(
+                {"error": "Campo 'watched' é obrigatório."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        step.watched = bool(watched_status)
+        step.save()
+
+        return Response({
+            "step": pk,
+            "watched_status": step.watched
+        }, status=status.HTTP_200_OK)

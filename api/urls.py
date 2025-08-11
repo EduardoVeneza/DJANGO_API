@@ -8,7 +8,7 @@ urlpatterns = [
 
     # Attachments por step
     path('steps/<int:step_id>/attachments/', AttachmentListCreateAPIView.as_view(), name='attachment-list-create'), # 100% TESTADOS, TRATADOS E FUNCIONAIS
-    path('attachments/<int:pk>/', AttachmentDetailAPIView.as_view(), name='attachment-detail'),
+    path('attachments/<int:pk>/', AttachmentDetailAPIView.as_view(), name='attachment-detail'), # 100% testado e funcional
 
     # Trails URLS
     path('trails/', TrailListAPIView.as_view()), # 100% TESTADOS, TRATADOS E FUNCIONAIS
@@ -17,4 +17,5 @@ urlpatterns = [
     # Steps vinculados à trilha
     path('trails/<int:trail_id>/steps/', StepListCreateForTrail.as_view(), name='trail-steps'), # 100% TESTADOS, TRATADOS E FUNCIONAIS
     path('steps/<int:pk>/', StepDetail.as_view(), name='step-detail'), # 100% TESDADOS, TRATADOS E FUNCIONAIS
+    path('steps/<int:pk>/isWatched/', WatchedStatusAPIView.as_view(), name='watched-post')
 ]

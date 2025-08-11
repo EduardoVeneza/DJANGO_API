@@ -170,3 +170,11 @@ LinkSchema = openapi.Schema(
     },
     read_only=['step']
 )
+
+watched_schema = openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'watched': openapi.Schema(type=openapi.TYPE_BOOLEAN, description='Status de visualização')
+            },
+            required=['watched']
+            )

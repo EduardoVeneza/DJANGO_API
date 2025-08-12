@@ -23,13 +23,6 @@ trail_post_schema = openapi.Schema(
             readOnly=True,
             title="Create at"
         ),
-        'number_of_steps': openapi.Schema(
-            type=openapi.TYPE_INTEGER,
-            title="Number of steps",
-            minimum=0,
-            maximum=9223372036854776000,
-            default=10
-        ),
         'autor': openapi.Schema(
             type=openapi.TYPE_STRING,
             title="autor",

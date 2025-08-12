@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from drf_yasg.utils import swagger_auto_schema
 from django.shortcuts import get_object_or_404
-from trilhas.models import Trail, Step, Link, Attachment
-from .serializers import TrailSerializer, StepSerializer, LinkSerializer, AttachmentSerializer
+from .models import Trail, Step, Link, Attachment
+from .serializers import TrailSerializer, StepSerializer, LinkSerializer, AttachmentSerializer, TrailDetailSerializer
 from .swagger_schemas import StepCreateSchema, trail_put_schema, trail_post_schema, LinkSchema, AttachmentSchema, watched_schema
 
 # Essa classe se encarrega de responder requisições no URL: trails/
@@ -42,7 +42,6 @@ class TrailListAPIView(APIView):
 # Essa classe se encarrega de responder requisições no URL: trails/<str:pk>/
 # Implementa o CRUD que permite que o usuário manipule as trails
 class TrailDetailAPIView(APIView):
-
     @swagger_auto_schema(
         responses={200: TrailSerializer},
         operation_description="GET /api/trails/{pk}/ - Retorna os detalhes de uma trilha específica pelo ID."
@@ -54,7 +53,7 @@ class TrailDetailAPIView(APIView):
             return Response({"detail" : "The Given Trail ID is not an integer"}, status=status.HTTP_400_BAD_REQUEST)
             
         trail = get_object_or_404(Trail, id=pk)
-        serializer = TrailSerializer(trail)
+        serializer = TrailDetailSerializer(trail)
         return Response(serializer.data)
 
     @swagger_auto_schema(

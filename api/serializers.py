@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from trilhas.models import Trail, Link, Step, Attachment
+from .models import Trail, Link, Step, Attachment
 
 class TrailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,6 +13,9 @@ class TrailSerializer(serializers.ModelSerializer):
         if qs.exists():
             raise serializers.ValidationError("Já existe um trail com esse título.")
         return value
+    
+    def get_number_of_steps(self, obj):
+        return obj.steps.count()
 
 
 class StepSerializer(serializers.ModelSerializer):
@@ -77,3 +80,23 @@ class AttachmentSerializer(serializers.ModelSerializer):
                   'created_at', 
                   'step'
                   ]
+
+class StepDetailSerializer(serializers.ModelSerializer):
+    links = LinkSerializer(many=True, read_only=True)
+    attachments = AttachmentSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Step
+        fields = ['id', 'title', 'description', 'video_url', 'watched', 'position', 'links', 'attachments']
+
+
+class TrailDetailSerializer(serializers.ModelSerializer):
+    steps = StepDetailSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Trail
+        fields = ['id', 'title', 'description', 'create_at', 'number_of_steps', 'autor', 'steps']
+
+
+    def get_number_of_steps(self, obj):
+        return obj.steps.count()

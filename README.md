@@ -62,8 +62,6 @@ python manage.py runserver
 
     Swagger: http://127.0.0.1:8000/swagger/
 
-    Painel Admin: http://127.0.0.1:8000/admin/
-
 📌 Endpoints Principais
 Trilhas
 

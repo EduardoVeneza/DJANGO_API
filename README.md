@@ -33,7 +33,7 @@ Este projeto é uma API REST desenvolvida com Django e Django REST Framework par
 
 ## 📦 Instalação
 
-### 1️⃣ Clonar o repositório ou baixar zip e descompactar
+### 1️⃣ Clonar o repositório ou baixar o arquivo zip e descompactar
 ```bash
 git clone https://github.com/seu-usuario/DJANGO_API.git
 cd DJANGO_API

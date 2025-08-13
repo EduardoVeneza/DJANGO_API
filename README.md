@@ -148,6 +148,10 @@ Dessa forma, fica flexivel definir qual o lugar de cada etapa dentro da trilha d
 ### 7. Atualize o estado de assistido ou não por esses endpoints:
 <img width="1426" height="110" alt="image" src="https://github.com/user-attachments/assets/20d99944-800a-4371-86e6-e656ab2bc816" />
 
+### 8. Por fim, liste a trilha toda de forma detalhada utilizando:
+<img width="1278" height="848" alt="image" src="https://github.com/user-attachments/assets/c1513a11-9344-47d9-838b-91799608d18a" />
+
+
 ## Tudo que foi listado e criado, possui um CRUD próprio para atualização e exclusão no banco de dados diretamente
 Entretando num projeto real, talvez seja melhor utilizar SQLITE ou MongoDB para CACHE, e só depois migrar para um banco de dados mySQL ou PostgreSQL
 

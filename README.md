@@ -39,11 +39,13 @@ git clone https://github.com/seu-usuario/DJANGO_API.git
 cd DJANGO_API
 ```
 ### 2️⃣ Criar ou ativar ambiente virtual (como já existe um, pelo linux basta indicar no "activate" na bin
+Lembre de rodar com permissões de administrador no windows, se tiver dificuldades, aconselho usar o gitbash, e seguir com comandos linux/bash
 ```bash
-source api_venv/bin/activate  # Linux/Mac
+python -m venv venv # Linux/Mac
+source venv/bin/activate  # Linux/Mac
 
 python -m venv venv      # Windows
-venv\Scripts\activate    # Windows
+.\venv\Scripts\activate    # Windows
 ```
 ### 3️⃣ Instalar as dependências
 ```bash
